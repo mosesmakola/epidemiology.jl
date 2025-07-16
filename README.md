@@ -1,1 +1,1 @@
-# epidemiology.jl
+# Epidemiology.jl
