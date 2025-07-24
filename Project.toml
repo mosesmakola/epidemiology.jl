@@ -2,3 +2,11 @@ name = "Epidemiology"
 uuid = "9318838c-1145-49f1-902c-3d4621af027d"
 authors = ["mosesmakola <mail@mosesmakola.com>"]
 version = "0.1.0"
+
+[deps]
+Distributions = "31c24e10-a181-5473-b8eb-7969acd0382f"
+Turing = "fce5fe82-541a-59a6-adf8-730c64b5f9a0"
+
+[compat]
+Distributions = "0.25.120"
+Turing = "0.39.6"
