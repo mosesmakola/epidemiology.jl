@@ -1,4 +1,5 @@
 using Distributions
+using DataFrames
 
 """
     meanvar_to_gamma(μ::Real, σ²::Real) -> (shape, scale)
@@ -50,4 +51,34 @@ function simulate_lognormal(n::Int, μ::Real, σ²::Real)
     # Convert given mean and variance to meanlog and sdlog for LogNormal distribution
     meanlog, sdlog = meanvar_to_lognormal(μ, σ²)
     return rand(LogNormal(meanlog, sdlog), n)
+end
+
+
+
+
+function add_delays(infection_times::Vector{<:Real})
+    n = length(infection_times)
+
+    # Delay 1: incubation period (infection -> symptom onset)
+    incubation = rand(Gamma(5, 1), n)
+
+    onset_time = infection_times .+ incubation
+
+    # Delay 2: symptom -> hospitalisation (only for 30%)
+    is_hospitalised = rand(Bool, n) .< 0.3 # 30% TRUE
+
+    hosp_delay = rand(LogNormal(1.75, 0.5), n)
+    hosp_time = Vector{Union{Missing, Float64}}(missing, n)
+
+    for i in 1:n
+        if is_hospitalised[i]
+            hosp_time[i] = onset_time[i] + hosp_delay[i]
+        end
+    end
+
+    return DataFrame(
+        infection_time = infection_times,
+        onset_time = onset_time,
+        hosp_time = hosp_time
+    )
 end
