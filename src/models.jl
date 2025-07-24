@@ -2,7 +2,7 @@ using Turing
 using Distributions
 
 """
-    gamma_fit(y::Vector{<Real})
+    gamma_fit(y::Vector{<:Real})
 
 Fit Gamma(shape, scale) to vector y.
 
@@ -10,7 +10,7 @@ Builds model object that Turing uses for inference.
 
 """
 # Fit Gamma(shape, scale) to vector y
-@model function gamma_fit(y::Vector{<Real})
+@model function gamma_fit(y::Vector{<:Real})
     N = length(y)
 
     # Prior
@@ -24,13 +24,13 @@ Builds model object that Turing uses for inference.
 end
 
 """
-    lognormal_fit(y::Vector{<Real})
+    lognormal_fit(y::Vector{<:Real})
 
 Fit LogNormal(meanlog, sdlog) to vector y.
 
 """
 # Fit a LogNormal(meanlog, sdlog) to vector y
-@model function lognormal_fit(y::Vector{<Real})
+@model function lognormal_fit(y::Vector{<:Real})
     N = length(y)
 
     # Prior

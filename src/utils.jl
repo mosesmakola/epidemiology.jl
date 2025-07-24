@@ -15,7 +15,7 @@ function meanvar_to_gamma(μ::Real, σ²::Real)
 end
 
 """
-    simulate_gamma(n::Int, μ::Real, σ²::Real) -> Vector{<Real}
+    simulate_gamma(n::Int, μ::Real, σ²::Real) -> Vector{<:Real}
 
 Generate n random samples from from a Gamma distribution with given mean "μ" and variance "σ²".
 
@@ -41,7 +41,7 @@ function meanvar_to_lognormal(μ::Real, σ²::Real)
 end
 
 """
-    simulate_lognormal(n::Int, μ::Real, σ²::Real) -> Vector{<Real}
+    simulate_lognormal(n::Int, μ::Real, σ²::Real) -> Vector{<:Real}
 
 Generate n random samples from from a LogNormal distribution with given mean "μ" and variance "σ²".
 

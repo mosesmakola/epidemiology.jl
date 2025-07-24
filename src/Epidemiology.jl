@@ -4,7 +4,7 @@ include("utils.jl")
 include("models.jl")
 
 """
-    build_model(dist::Symbol, y::Vector{<Real})
+    build_model(dist::Symbol, y::Vector{<:Real})
 
 Select model to build based on symbol provided.
 """
