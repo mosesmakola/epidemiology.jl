@@ -53,14 +53,19 @@ function simulate_lognormal(n::Int, μ::Real, σ²::Real)
     return rand(LogNormal(meanlog, sdlog), n)
 end
 
+"""
+    add_delays(infection_times::Vector{<:Real}) -> DataFrame
 
+Simulate symptom onset and hospitilisation times from infection times.
 
+Returns a data frame with columns for infection time, onset time and hospitilasation time (only for 30%).
 
-function add_delays(infection_times::Vector{<:Real})
+"""
+function add_delays(infection_times::Vector{<:Real}, days::int)
     n = length(infection_times)
 
     # Delay 1: incubation period (infection -> symptom onset)
-    incubation = rand(Gamma(5, 1), n)
+    incubation = rand(Gamma(days, 1), n)
 
     onset_time = infection_times .+ incubation
 
