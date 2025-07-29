@@ -64,7 +64,7 @@ Returns a data frame with the following columns:
  - `hosp_time` (only for 30% of the patients; the remaining 70% are `missing`).
 
 """
-function add_delays(infection_times::Vector{<:Real}, days::int)
+function add_delays(infection_times::AbstractVector{<:Real}, days::Int)
     n = length(infection_times)
 
     # Delay 1: incubation period (infection -> symptom onset)
