@@ -70,7 +70,7 @@ function add_delays(infection_times::Vector{<:Real}, days::int)
     onset_time = infection_times .+ incubation
 
     # Delay 2: symptom -> hospitalisation (only for 30%)
-    is_hospitalised = rand(Bool, n) .< 0.3 # 30% TRUE
+    is_hospitalised = rand(n) .< 0.3 # 30% TRUE
 
     hosp_delay = rand(LogNormal(1.75, 0.5), n)
     hosp_time = Vector{Union{Missing, Float64}}(missing, n)
