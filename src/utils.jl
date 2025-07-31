@@ -61,7 +61,7 @@ Simulate symptom onset and hospitilisation times from infection times.
 Returns a data frame with columns for infection time, onset time and hospitilasation time (only for 30%).
 
 """
-function add_delays(infection_times::Vector{<:Real}, days::int)
+function add_delays(infection_times::Vector{<:Real}, days::Int)
     n = length(infection_times)
 
     # Delay 1: incubation period (infection -> symptom onset)
@@ -86,4 +86,12 @@ function add_delays(infection_times::Vector{<:Real}, days::int)
         onset_time = onset_time,
         hosp_time = hosp_time
     )
+end
+
+
+function add_onset_to_df(df::DataFrame)
+    df.onset_to_hosp = df.hosp_time .- df.onset_time
+    df_clean = dropmissing(df, :onset_to_hosp)
+
+    return df_clean
 end
