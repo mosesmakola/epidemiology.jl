@@ -91,10 +91,17 @@ function add_delays(infection_times::AbstractVector{<:Real}, days::Int)
     )
 end
 
-
 function add_onset_to_df(df::DataFrame)
     df.onset_to_hosp = df.hosp_time .- df.onset_time
     df_clean = dropmissing(df, :onset_to_hosp)
 
     return df_clean
+end
+
+function censor_to_days(df::DataFrame)
+    return DataFrame(
+        infection_time = floor.(df.infection_time),
+        onset_time = floor.(df.onset_time),
+        hosp_time = passmissing(x -> floor(x)).(df.hosp_time),
+    )
 end
