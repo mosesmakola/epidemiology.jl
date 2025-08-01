@@ -43,3 +43,21 @@ Fit LogNormal(meanlog, sdlog) to vector y.
     end
 end
     
+
+@model function censored_lognormal_fit(y::Vector{Int})
+    N = length(y)
+
+    # Prior
+    meanlog ~ Normal(0, 10)
+    sdlog ~ truncated(Normal(0, 10); lower=0)
+
+    onset_day_time ~ filldist(Uniform(0, 1), N)
+    hosp_day_time ~ filldist(Uniform(0, 1), N)
+
+    # Likelihood
+    true_onset_to_hosp = Vector{Real}(undef, N)
+    for i in 1:N
+        true_onset_to_hosp[i] = y[i] + hosp_day_time[i] ~ onset_day_time[i]
+        true_onset_to_hosp[i] ~ LogNormal(meanlog, sdlog)
+    end
+end

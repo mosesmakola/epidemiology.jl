@@ -91,7 +91,7 @@ function add_delays(infection_times::AbstractVector{<:Real}, days::Int)
     )
 end
 
-function add_onset_to_df(df::DataFrame)
+function add_onset_to_hosp(df::DataFrame)
     df.onset_to_hosp = df.hosp_time .- df.onset_time
     df_clean = dropmissing(df, :onset_to_hosp)
 
