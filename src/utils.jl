@@ -91,6 +91,18 @@ function add_delays(infection_times::AbstractVector{<:Real}, days::Int)
     )
 end
 
+"""
+    add_onset_to_hosp(df::DataFrame) -> DataFrame
+
+Compute the delay from symptom onset to hospitalisation and remove rows with missing hospitalisation times.
+
+# Arguments
+- df::DataFrame: A data frame with columns 'onset_time' and 'hosp_time'. 'hosp_time' column may contain missing for individuals who were not hospitalised.
+
+# Returns
+- A cleaned 'DataFrame' with a new column 'onset_to_hosp' representing the delay (in days) from hospitalisation. Rows with missing values in 'hosp_time' are dropped.
+
+"""
 function add_onset_to_hosp(df::DataFrame)
     df.onset_to_hosp = df.hosp_time .- df.onset_time
     df_clean = dropmissing(df, :onset_to_hosp)
@@ -98,6 +110,21 @@ function add_onset_to_hosp(df::DataFrame)
     return df_clean
 end
 
+"""
+    censor_to_days(df::DataFrame) -> DataFrame
+
+Convert continuous times (in decimal days) to whole days by flooring each value to the nearest lower integer.
+
+This simulates interval censoring, where vents are only recorded by the day and not the exact time. Used to mimic how real-world epidemiological data (e.g. hospitalisation) are usually recoreded as dates.
+
+# Arguments
+- df::DataFrame: A data frame with columns 'infection_time', 'onset_time' and 'hosp_time'. 'hosp_time' may contain 'missing' values.
+
+# Returns
+- A 'DataFrame' with the same columns, but all time values floored to the nearest day. For 'missing' values in 'hosp_time', the value remains 'missing'
+
+
+"""
 function censor_to_days(df::DataFrame)
     return DataFrame(
         infection_time = floor.(df.infection_time),
