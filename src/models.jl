@@ -78,7 +78,7 @@ This model estimates the true continous delay between events by introducing late
         # Add fractional day offsets to integer delay
         true_onset_to_hosp[i] = y[i] + hosp_day_time[i] - onset_day_time[i]
         # Likelihood: true continous delay follows LogNormal
-        true_onset_to_hosp[i] ~ LogNormal(meanlog, sdlog)
+        @addlogprob!(logpdf(LogNormal(meanlog, sdlog), true_onset_to_hosp[i]))
     end
 end
 
