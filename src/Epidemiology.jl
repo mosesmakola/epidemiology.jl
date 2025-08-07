@@ -1,4 +1,6 @@
 module Epidemiology
+using DataFrames
+using Turing
 
 include("utils.jl")
 include("models.jl")
@@ -8,7 +10,7 @@ include("models.jl")
 
 Select model to build based on symbol provided.
 """
-# Select model based on symbolwhy
+# Select model based on symbol
 function build_model(dist::Symbol, y::Vector{<:Real})
     if dist == :gamma
         return gamma_fit(y)
@@ -20,5 +22,6 @@ function build_model(dist::Symbol, y::Vector{<:Real})
 end
 
 export build_model
+export dropmissing
 
 end # module epidemiology
