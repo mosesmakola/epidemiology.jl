@@ -6,11 +6,13 @@ version = "0.1.0"
 [deps]
 DataFrames = "a93c6f00-e57d-5684-b7b6-d8193f3e46c0"
 Distributions = "31c24e10-a181-5473-b8eb-7969acd0382f"
+StatsBase = "2913bbd2-ae8a-5f71-8c99-4fb6c76f3a91"
 StatsPlots = "f3b207a7-027a-5e70-b257-86293d7955fd"
 Turing = "fce5fe82-541a-59a6-adf8-730c64b5f9a0"
 
 [compat]
 DataFrames = "1.7.0"
 Distributions = "0.25.120"
+StatsBase = "0.34.6"
 StatsPlots = "0.15.7"
 Turing = "0.39.6"

@@ -1,5 +1,7 @@
+using Random
 using Distributions
 using DataFrames
+using StatsBase
 
 """
     meanvar_to_gamma(μ::Real, σ²::Real) -> (shape, scale)
@@ -132,3 +134,68 @@ function censor_to_days(df::DataFrame)
         hosp_time = passmissing(x -> floor(x)).(df.hosp_time),
     )
 end
+
+"""
+    mako_daily_infections(infection_times::AbstractVector{<:Real}) -> DataFrame
+    make_daily_infections(df::DataFrame, col::Symbol = infection_time) -> DataFrame
+
+Convert infection times (continuous) into a daily time series with zeros filled for days with no infections.
+
+# Returns DataFrame with
+- infection_day::Int: day index (floored)
+- infections::Int: count of infections that day
+"""
+function make_daily_infections(infection_times::AbstractVector{<:Real})
+    # Censor to whole days
+    days = floor.(Int, infection_times)
+
+    mins, maxs = minimum(days), maximum(days)
+
+    # Dict(day => count)
+    day_counts = countmap(days)
+
+    # fill missing days with zero
+    infection_day = collect(mins:maxs)
+
+    infections = [get(day_counts, d, 0) for d in infection_day]
+
+    return DataFrame(infection_day = infection_day, infections = infections)
+end
+
+function make_daily_infections(df::DataFrame; col::Symbol = :infection_time)
+    cols = Symbol.(names(df))  # convert to Symbols
+    @assert col in cols "Column $(col) not found in DataFrame; available columns are: $(cols)"
+    return make_daily_infections(df[!, col])
+end
+
+
+function simulate_uniform_infections(n::Int, max_days::Int)
+    return rand(Uniform(0, max_days), n)
+end
+
+
+"""
+    censored_delay_pmf(rgen, max_delay::Int, n::Int = 1_000_000, dist_args...)
+
+
+"""
+
+function censored_delay_pmf(dist_type, max_delay::Int; n::Int = 1_000_000, kwargs...)
+    # 1. Uniform infection time within the day
+    first = rand(n) # uniform between 0 and 1
+
+    # 2. Draw delay samples
+    dist = dist_type(; kwargs...) # build distribution from keyword args
+    # Get the exact time of the second event
+    second = first .+ rand(dist, n)
+
+    # 3. Floor to get delay in days
+    delay_days = floor.(Int, second)
+
+    # 4. Count occurrences for days 0:max_delay
+    counts = [count(==(d), delay_days) for d in 0:max_delay] 
+
+    # 5. Normalise to get pmf
+    pmf = counts ./ sum(counts)
+
+    return pmf
