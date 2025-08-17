@@ -109,3 +109,10 @@ The model is for right truncated data (some hospitalisation events might not yet
         onset_to_hosp[i] ~ truncated(LogNormal(meanlog, sdlog); upper = time_since_onset[i])
     end
 end
+
+@model function estimate_infections(obs::Vector{Int}, ip_pmf::Vector{Float64})
+    n = length(obs)
+    infections ~ filldist(truncated(Normal(0, 10); lower=0), n)
+    onsets = convolve_with_delay(infections, ip_pmf)
+    obs ~ arraydist([Poisson(λ) for λ in onsets])
+end

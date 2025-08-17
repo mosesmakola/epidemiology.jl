@@ -163,11 +163,18 @@ function make_daily_infections(infection_times::AbstractVector{<:Real})
 end
 
 function make_daily_infections(df::DataFrame; col::Symbol = :infection_time)
-    cols = Symbol.(names(df))  # convert to Symbols
     @assert col in cols "Column $(col) not found in DataFrame; available columns are: $(cols)"
     return make_daily_infections(df[!, col])
 end
 
+function make_daily_infections_vectors(infection_times::AbstractVector{<:Real})
+    days = floor.(Int, infection_times)
+    mins, maxs = minimum(days), maximum(days)
+    day_counts = countmap(days)
+    infection_day = collect(mins:maxs)
+    infections = [get(day_counts, d, 0) for d in infection_day]
+    return infection_day, infections
+end
 
 function simulate_uniform_infections(n::Int, max_days::Int)
     return rand(Uniform(0, max_days), n)
@@ -179,7 +186,6 @@ end
 
 
 """
-
 function censored_delay_pmf(dist_type, max_delay::Int; n::Int = 1_000_000, kwargs...)
     # 1. Uniform infection time within the day
     first = rand(n) # uniform between 0 and 1
@@ -199,3 +205,45 @@ function censored_delay_pmf(dist_type, max_delay::Int; n::Int = 1_000_000, kwarg
     pmf = counts ./ sum(counts)
 
     return pmf
+end
+
+function censored_delay_pmf(dist::Distribution, max_delay::Int; n::Int = 1_000_000)
+    first = rand(n)
+
+    second = first .+ rand(dist, n)
+
+    delay_days = floor.(Int, second)
+
+    counts = [count(==(d), delay_days) for d in 0:max_delay]
+
+    pmf = counts ./ sum(counts)
+    
+    return pmf
+end
+
+"""
+    convolve_with_delay(ts::AbstractVector{<:Real}, delay_pmf::AbstractVector{<:Real})
+"""
+function convolve_with_delay(ts::AbstractVector{<:Real}, delay_pmf::AbstractVector{<:Real})
+    max_delay = length(delay_pmf) - 1 # subtract one because PMF is 0-indexed
+    convolved = similar(ts)
+
+    for i in 1:length(ts)
+        # get starting index for this delay window
+        first_index = max(1, i-max_delay)
+        ts_segment = ts[first_index:i]
+
+        # take reverse of omf and cut if needed
+        pmf = reverse(delay_pmf[1:(i - first_index + 1)])
+
+        # convolve with delay distribution
+        convolved[i] = sum(ts_segment .* pmf)
+    end
+
+    return convolved
+end
+
+function add_poisson_uncertainty(onsets::Vector{<:Real})
+    return rand.(Poisson.(onsets))
+end
+
